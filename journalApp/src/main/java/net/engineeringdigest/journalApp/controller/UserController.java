@@ -24,6 +24,15 @@ public class UserController {
         return userService.getAll();
     }
 
+    @GetMapping("/{userName}")
+    public ResponseEntity<?> getUserByUserName(@PathVariable String userName){
+        User userInDb = userService.findByUserName(userName);
+        if(userInDb != null){
+            return new ResponseEntity<>(userInDb,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @PostMapping
     public void createUser(@RequestBody User user){
         userService.saveEntry(user);
@@ -40,4 +49,14 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable String id){
+        Optional<User> found = userService.findById(id);
+        userService.deleteById(id);
+        if (found.isPresent()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
 }
