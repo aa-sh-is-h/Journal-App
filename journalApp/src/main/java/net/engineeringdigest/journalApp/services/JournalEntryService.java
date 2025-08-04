@@ -6,6 +6,7 @@ import net.engineeringdigest.journalApp.repository.JournalEntryRepository;
 import net.engineeringdigest.journalApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +27,16 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
+    @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
-        JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
-        User userInDb = userService.findByUserName(userName);
-        userInDb.getJournalEntries().add(savedEntry);
-        userService.saveEntry(userInDb);
+        try {
+            JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
+            User userInDb = userService.findByUserName(userName);
+            userInDb.getJournalEntries().add(savedEntry);
+            userService.saveEntry(userInDb);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void saveEntry(JournalEntry journalEntry){
