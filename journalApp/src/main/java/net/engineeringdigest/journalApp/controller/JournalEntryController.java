@@ -2,8 +2,8 @@ package net.engineeringdigest.journalApp.controller;
 
 import net.engineeringdigest.journalApp.entity.JournalEntry;
 import net.engineeringdigest.journalApp.entity.User;
-import net.engineeringdigest.journalApp.services.JournalEntryService;
-import net.engineeringdigest.journalApp.services.UserService;
+import net.engineeringdigest.journalApp.services.JournalEntryServiceImpl;
+import net.engineeringdigest.journalApp.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ import java.util.Optional;
 @RequestMapping("journal")
 public class JournalEntryController {
     @Autowired
-    JournalEntryService journalEntryService;
+    JournalEntryServiceImpl journalEntryService;
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     @GetMapping("/all")
     public List<JournalEntry> getAll(){
@@ -53,7 +53,7 @@ public class JournalEntryController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new RuntimeException(e);
         }
     }
 
