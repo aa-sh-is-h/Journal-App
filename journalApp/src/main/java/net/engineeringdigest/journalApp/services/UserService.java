@@ -10,7 +10,8 @@ public interface UserService {
 
     Optional<User> findById(String id);
 
-    void saveEntry(User user);
+    void saveNewUser(User user);
+    void saveExistingUser(User user);
 
     void deleteById(String id);
 

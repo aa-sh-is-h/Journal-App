@@ -10,5 +10,5 @@ public interface JournalEntryService {
     Optional<JournalEntry> findById(String id);
     void saveEntry(JournalEntry journalEntry, String userName);
     void saveEntry(JournalEntry journalEntry);
-    void deleteById(String id, String userName);
+    boolean deleteById(String id, String userName);
 }

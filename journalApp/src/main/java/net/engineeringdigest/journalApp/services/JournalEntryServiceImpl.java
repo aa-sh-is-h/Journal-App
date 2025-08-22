@@ -32,10 +32,11 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
         try {
-            JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
             User userInDb = userService.findByUserName(userName);
+            JournalEntry savedEntry = journalEntryRepository.save(journalEntry);
+
             userInDb.getJournalEntries().add(savedEntry);
-            userService.saveEntry(userInDb);
+            userService.saveExistingUser(userInDb);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,11 +48,21 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     @Override
-    public void deleteById(String id, String userName){
-        User userInDb = userService.findByUserName(userName);
-        userInDb.getJournalEntries().removeIf(x -> x.getId().equals(id));
-        userService.saveEntry(userInDb);
-        journalEntryRepository.deleteById(id);
+    @Transactional
+    public boolean deleteById(String id, String userName){
+        boolean removed = false;
+        try {
+            User userInDb = userService.findByUserName(userName);
+            removed = userInDb.getJournalEntries().removeIf(x -> x.getId().equals(id));
+            if(removed) {
+                userService.saveExistingUser(userInDb);
+                journalEntryRepository.deleteById(id);
+            }
+            return removed;
+        } catch (Exception e) {
+            throw new RuntimeException("Some Error While Deleting the Entry",e);
+        }
+
     }
 
 }
