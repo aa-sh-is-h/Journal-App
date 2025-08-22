@@ -43,7 +43,7 @@ public class JournalEntryController {
         if(!usersAllEntries.isEmpty()){
             return new ResponseEntity<>(usersAllEntries, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/{userName}")
