@@ -18,20 +18,20 @@ pipeline {
         stage('Build') {
             steps {
                 echo "Building application..."
-                bat 'mvn clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Verify JAR') {
             steps {
-                bat 'dir target'
+                sh 'dir target'
             }
         }
 
         stage('Stop Old Application') {
             steps {
                 script {
-                    bat '''
+                    sh '''
                     for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080') do taskkill /PID %%a /F
                     '''
                 }
@@ -40,7 +40,7 @@ pipeline {
 
         stage('Backup Previous Build') {
             steps {
-                bat '''
+                sh '''
                 if exist "%DEPLOY_DIR%\\app.jar" (
                     copy "%DEPLOY_DIR%\\app.jar" "%DEPLOY_DIR%\\app-backup.jar" /Y
                 )
@@ -50,7 +50,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                bat '''
+                sh '''
                 copy target\\*.jar "%DEPLOY_DIR%\\app.jar" /Y
                 '''
             }
@@ -58,7 +58,7 @@ pipeline {
 
         stage('Start Application') {
             steps {
-                bat '''
+                sh '''
                 start /B java -jar "%DEPLOY_DIR%\\app.jar"
                 '''
             }
