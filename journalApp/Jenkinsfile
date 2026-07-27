@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "springboot-app"
+        DEPLOY_DIR = "C:\\Deployments\\SpringBoot"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building application..."
+                bat 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Verify JAR') {
+            steps {
+                bat 'dir target'
+            }
+        }
+
+        stage('Stop Old Application') {
+            steps {
+                script {
+                    bat '''
+                    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8080') do taskkill /PID %%a /F
+                    '''
+                }
+            }
+        }
+
+        stage('Backup Previous Build') {
+            steps {
+                bat '''
+                if exist "%DEPLOY_DIR%\\app.jar" (
+                    copy "%DEPLOY_DIR%\\app.jar" "%DEPLOY_DIR%\\app-backup.jar" /Y
+                )
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                bat '''
+                copy target\\*.jar "%DEPLOY_DIR%\\app.jar" /Y
+                '''
+            }
+        }
+
+        stage('Start Application') {
+            steps {
+                bat '''
+                start /B java -jar "%DEPLOY_DIR%\\app.jar"
+                '''
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "Deployment Successful"
+        }
+
+        failure {
+            echo "Deployment Failed"
+        }
+    }
+}
