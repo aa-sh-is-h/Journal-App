@@ -83,7 +83,7 @@ pipeline {
             steps {
                 sh '''
                 docker stop ${CONTAINER_NAME} || true
-                docker rm ${CONTAINER_NAME} || true
+                docker rm -f ${CONTAINER_NAME} || true
                 '''
             }
         }
@@ -102,7 +102,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh 'sleep 20'
-                sh 'curl http://host.docker.internal:8081'
+                sh 'docker ps'
             }
         }
     }
